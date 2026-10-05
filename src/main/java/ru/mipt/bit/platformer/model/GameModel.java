@@ -1,26 +1,25 @@
 package ru.mipt.bit.platformer.model;
 
-import com.badlogic.gdx.math.GridPoint2;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
-public class GameModel {
-    private final Field field;
-    private final Tank tank;
+public class GameModel implements Updatable {
+    private final List<Updatable> objects = new ArrayList<>();
 
-    public GameModel() {
-        field = new Field();
-        field.addTree(new Tree(new GridPoint2(1, 3)));
-        tank = new Tank(new GridPoint2(1, 1), field);
+    public GameModel(Collection<? extends Updatable> objects) {
+        objects.forEach(this::addObject);
     }
 
+    public void addObject(Updatable object) {
+        objects.add(Objects.requireNonNull(object));
+    }
+
+    @Override
     public void update(float deltaTime) {
-        tank.update(deltaTime);
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    public Tank getTank() {
-        return tank;
+        for (Updatable object : objects) {
+            object.update(deltaTime);
+        }
     }
 }

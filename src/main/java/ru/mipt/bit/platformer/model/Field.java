@@ -5,21 +5,23 @@ import com.badlogic.gdx.math.GridPoint2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class Field {
-    private final List<Tree> trees = new ArrayList<>();
+public class Field implements Passability {
+    private final List<Obstacle> obstacles = new ArrayList<>();
 
-    public void addTree(Tree tree) {
-        trees.add(tree);
+    public void addObstacle(Obstacle obstacle) {
+        obstacles.add(Objects.requireNonNull(obstacle));
     }
 
-    public List<Tree> getTrees() {
-        return Collections.unmodifiableList(trees);
+    public List<Obstacle> getObstacles() {
+        return Collections.unmodifiableList(obstacles);
     }
 
+    @Override
     public boolean isPassable(GridPoint2 tile) {
-        for (Tree tree : trees) {
-            if (tree.occupies(tile)) {
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle.occupies(tile)) {
                 return false;
             }
         }

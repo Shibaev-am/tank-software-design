@@ -2,33 +2,30 @@ package ru.mipt.bit.platformer;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import ru.mipt.bit.platformer.graphics.GameRenderer;
-import ru.mipt.bit.platformer.input.KeyboardHandler;
-import ru.mipt.bit.platformer.input.TankControls;
-import ru.mipt.bit.platformer.model.GameModel;
+
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public class TankGame extends ApplicationAdapter {
-    private GameModel model;
-    private KeyboardHandler keyboard;
-    private GameRenderer renderer;
+    private final Supplier<GameLoop> createLoop;
+    private GameLoop loop;
+
+    public TankGame(Supplier<GameLoop> createLoop) {
+        this.createLoop = Objects.requireNonNull(createLoop);
+    }
 
     @Override
     public void create() {
-        model = new GameModel();
-        keyboard = new KeyboardHandler(Gdx.input::isKeyPressed);
-        TankControls.bindMovement(keyboard, model.getTank());
-        renderer = new GameRenderer(model);
+        loop = createLoop.get();
     }
 
     @Override
     public void render() {
-        keyboard.update();
-        model.update(Gdx.graphics.getDeltaTime());
-        renderer.render();
+        loop.render(Gdx.graphics.getDeltaTime());
     }
 
     @Override
     public void dispose() {
-        renderer.dispose();
+        loop.dispose();
     }
 }
