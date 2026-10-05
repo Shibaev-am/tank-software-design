@@ -11,35 +11,50 @@ public class FieldTest {
     @Test
     public void emptyFieldHasNoObstacles() {
         Field field = new Field();
-        assertTrue(field.getTrees().isEmpty());
+        assertTrue(field.getObstacles().isEmpty());
         assertTrue(field.isPassable(new GridPoint2(1, 1)));
     }
 
     @Test
-    public void allAddedTreesBlockTheirTiles() {
+    public void allAddedObstaclesBlockTheirTiles() {
         Field field = new Field();
-        field.addTree(new Tree(new GridPoint2(1, 2)));
-        field.addTree(new Tree(new GridPoint2(2, 1)));
+        field.addObstacle(new Tree(new GridPoint2(1, 2)));
+        field.addObstacle(new Tree(new GridPoint2(2, 1)));
         assertFalse(field.isPassable(new GridPoint2(1, 2)));
         assertFalse(field.isPassable(new GridPoint2(2, 1)));
         assertTrue(field.isPassable(new GridPoint2(0, 1)));
-        assertEquals(2, field.getTrees().size());
+        assertEquals(2, field.getObstacles().size());
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void treesCannotBeRemovedThroughTheGetter() {
+    public void obstaclesCannotBeRemovedThroughTheGetter() {
         Field field = new Field();
-        field.addTree(new Tree(new GridPoint2(1, 2)));
-        field.getTrees().clear();
+        field.addObstacle(new Tree(new GridPoint2(1, 2)));
+        field.getObstacles().clear();
     }
 
     @Test
-    public void treeViewReflectsNewObstacles() {
+    public void obstacleListReflectsNewObstacles() {
         Field field = new Field();
-        List<Tree> trees = field.getTrees();
+        List<Obstacle> trees = field.getObstacles();
         Tree tree = new Tree(new GridPoint2(1, 2));
-        field.addTree(tree);
+        field.addObstacle(tree);
         assertSame(tree, trees.get(0));
         assertFalse(field.isPassable(tree.getCoordinates()));
+    }
+
+    @Test
+    public void acceptsANewObstacleWithADifferentFootprint() {
+        Field field = new Field();
+        field.addObstacle(tile -> tile.x >= 2 && tile.x <= 4 && tile.y == 3);
+        assertFalse(field.isPassable(new GridPoint2(2, 3)));
+        assertFalse(field.isPassable(new GridPoint2(4, 3)));
+        assertTrue(field.isPassable(new GridPoint2(5, 3)));
+        assertTrue(field.isPassable(new GridPoint2(2, 4)));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void rejectsNullObstacles() {
+        new Field().addObstacle(null);
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.IntPredicate;
 
-public class KeyboardHandler {
+public class KeyboardHandler implements InputHandler, KeyBindings {
     private final IntPredicate isKeyPressed;
     private final List<KeyBinding> bindings = new ArrayList<>();
 
@@ -13,14 +13,17 @@ public class KeyboardHandler {
         this.isKeyPressed = Objects.requireNonNull(isKeyPressed);
     }
 
+    @Override
     public void bindHeld(Runnable action, int... keys) {
         bindings.add(new KeyBinding(action, true, keys));
     }
 
+    @Override
     public void bindPressed(Runnable action, int... keys) {
         bindings.add(new KeyBinding(action, false, keys));
     }
 
+    @Override
     public void update() {
         for (KeyBinding binding : bindings) {
             binding.update(isKeyPressed);

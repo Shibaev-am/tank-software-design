@@ -1,38 +1,48 @@
 package ru.mipt.bit.platformer.graphics;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Disposable;
-import ru.mipt.bit.platformer.model.GameModel;
+import ru.mipt.bit.platformer.Renderer;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
-public class GameRenderer implements Disposable {
+public class GameRenderer implements Renderer {
     private final Batch batch;
-    private final FieldView fieldView;
-    private final TankView tankView;
+    private final Renderer background;
+    private final List<SpriteRenderer> views;
+    private final Color clearColor;
 
-    public GameRenderer(GameModel model) {
-        batch = new SpriteBatch();
-        fieldView = new FieldView(model.getField(), batch);
-        tankView = new TankView(model.getTank(), fieldView.getGroundLayer());
+    public GameRenderer(Batch batch, Renderer background,
+                        Collection<? extends SpriteRenderer> views, Color clearColor) {
+        this.batch = batch;
+        this.background = background;
+        this.views = new ArrayList<>(views);
+        this.clearColor = new Color(clearColor);
     }
 
+    @Override
     public void render() {
-        Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f);
+        Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
-        fieldView.renderGround();
+        background.render();
         batch.begin();
-        tankView.render(batch);
-        fieldView.renderTrees(batch);
+        for (SpriteRenderer view : views) {
+            view.render(batch);
+        }
         batch.end();
     }
 
     @Override
     public void dispose() {
-        tankView.dispose();
-        fieldView.dispose();
+        for (SpriteRenderer view : views) {
+            view.dispose();
+        }
+        background.dispose();
         batch.dispose();
     }
 }

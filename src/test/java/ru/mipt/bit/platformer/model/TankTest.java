@@ -13,13 +13,13 @@ public class TankTest {
     @Before
     public void setUp() {
         field = new Field();
-        tank = new Tank(new GridPoint2(1, 1), field);
+        tank = new Tank(new GridPoint2(1, 1), field, 0.4f, Direction.RIGHT);
     }
 
     @Test
     public void movesOneTileInEachDirection() {
         for (Direction direction : Direction.values()) {
-            Tank player = new Tank(new GridPoint2(3, 3), field);
+            Tank player = new Tank(new GridPoint2(3, 3), field, 0.4f, Direction.RIGHT);
             player.move(direction);
             player.update(0.4f);
             assertEquals(direction.nextTile(new GridPoint2(3, 3)), player.getCoordinates());
@@ -51,7 +51,7 @@ public class TankTest {
 
     @Test
     public void turnsTowardsTreeWithoutMovingIntoIt() {
-        field.addTree(new Tree(new GridPoint2(1, 2)));
+        field.addObstacle(new Tree(new GridPoint2(1, 2)));
         tank.move(Direction.UP);
         tank.update(0.4f);
         assertEquals(new GridPoint2(1, 1), tank.getCoordinates());
@@ -70,7 +70,7 @@ public class TankTest {
     @Test
     public void coordinatesCannotBeChangedFromOutside() {
         GridPoint2 start = new GridPoint2(1, 1);
-        Tank player = new Tank(start, field);
+        Tank player = new Tank(start, field, 0.4f, Direction.RIGHT);
         start.set(8, 8);
         player.getCoordinates().set(9, 9);
         assertEquals(new GridPoint2(1, 1), player.getCoordinates());
@@ -113,5 +113,40 @@ public class TankTest {
         tank.move(Direction.RIGHT);
         tank.update(0.4f);
         assertEquals(new GridPoint2(2, 2), tank.getCoordinates());
+    }
+
+    @Test
+    public void movementDurationAndInitialDirectionAreParameters() {
+        Tank player = new Tank(new GridPoint2(2, 2), field, 1f, Direction.DOWN);
+        assertEquals(Direction.DOWN, player.getDirection());
+        player.move(Direction.LEFT);
+        player.update(0.4f);
+        assertTrue(player.isMoving());
+        assertEquals(0.4f, player.getMovementProgress(), 0.0001f);
+        player.update(0.6f);
+        assertEquals(new GridPoint2(1, 2), player.getCoordinates());
+    }
+
+    @Test
+    public void usesAnArbitraryPassabilityPolicy() {
+        Tank player = new Tank(new GridPoint2(1, 1), tile -> tile.x < 2, 0.4f, Direction.UP);
+        player.move(Direction.RIGHT);
+        assertFalse(player.isMoving());
+        assertEquals(Direction.RIGHT, player.getDirection());
+        player.move(Direction.LEFT);
+        player.update(0.4f);
+        assertEquals(new GridPoint2(0, 1), player.getCoordinates());
+    }
+
+    @Test
+    public void rejectsInvalidMovementDurations() {
+        for (float duration : new float[]{0f, -1f, Float.NaN, Float.POSITIVE_INFINITY}) {
+            try {
+                new Tank(new GridPoint2(1, 1), field, duration, Direction.RIGHT);
+                fail("Invalid duration accepted: " + duration);
+            } catch (IllegalArgumentException expected) {
+                assertFalse(expected.getMessage().isEmpty());
+            }
+        }
     }
 }
