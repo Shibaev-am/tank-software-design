@@ -1,7 +1,5 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.input;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,12 +18,13 @@ public class TankControlsTest {
     private Field field;
     private Tank tank;
     private final Set<Integer> pressedKeys = new HashSet<>();
-    private final TankControls controls = new TankControls(pressedKeys::contains);
+    private final KeyboardHandler keyboard = new KeyboardHandler(pressedKeys::contains);
 
     @Before
     public void setUp() {
-        field = new Field(new TiledMapTileLayer(10, 8, 128, 128));
-        tank = new Tank(new TextureRegion(), new GridPoint2(1, 1), field);
+        field = new Field();
+        tank = new Tank(new GridPoint2(1, 1), field);
+        TankControls.bindMovement(keyboard, tank);
     }
 
     @Test
@@ -36,8 +35,10 @@ public class TankControlsTest {
             for (int key : keys[i]) {
                 pressedKeys.clear();
                 pressedKeys.add(key);
-                Tank player = new Tank(new TextureRegion(), new GridPoint2(3, 3), field);
-                controls.update(player);
+                Tank player = new Tank(new GridPoint2(3, 3), field);
+                KeyboardHandler input = new KeyboardHandler(pressedKeys::contains);
+                TankControls.bindMovement(input, player);
+                input.update();
                 player.update(0.4f);
                 assertEquals(directions[i].nextTile(new GridPoint2(3, 3)), player.getCoordinates());
             }
@@ -46,7 +47,7 @@ public class TankControlsTest {
 
     @Test
     public void noPressedKeysLeaveTankIdle() {
-        controls.update(tank);
+        keyboard.update();
         assertFalse(tank.isMoving());
         assertEquals(Direction.RIGHT, tank.getDirection());
     }
@@ -57,17 +58,17 @@ public class TankControlsTest {
         pressedKeys.add(LEFT);
         pressedKeys.add(DOWN);
         pressedKeys.add(RIGHT);
-        controls.update(tank);
+        keyboard.update();
         tank.update(0.4f);
         assertEquals(new GridPoint2(1, 2), tank.getCoordinates());
     }
 
     @Test
     public void blockedDirectionAllowsNextPressedDirection() {
-        field.addTree(new Tree(new TextureRegion(), new GridPoint2(1, 2)));
+        field.addTree(new Tree(new GridPoint2(1, 2)));
         pressedKeys.add(UP);
         pressedKeys.add(RIGHT);
-        controls.update(tank);
+        keyboard.update();
         tank.update(0.4f);
         assertEquals(new GridPoint2(2, 1), tank.getCoordinates());
         assertEquals(Direction.RIGHT, tank.getDirection());
@@ -77,8 +78,22 @@ public class TankControlsTest {
     public void holdingBothBindingsDoesNotMoveTwice() {
         pressedKeys.add(UP);
         pressedKeys.add(W);
-        controls.update(tank);
+        keyboard.update();
         tank.update(0.4f);
         assertEquals(new GridPoint2(1, 2), tank.getCoordinates());
+    }
+    @Test
+    public void extraActionCanRunWhileTankIsMoving() {
+        int[] shots = {0};
+        keyboard.bindPressed(() -> shots[0]++, SPACE);
+        pressedKeys.add(UP);
+        keyboard.update();
+        tank.update(0.1f);
+        pressedKeys.add(SPACE);
+        keyboard.update();
+        keyboard.update();
+        assertEquals(1, shots[0]);
+        assertEquals(Direction.UP, tank.getDirection());
+        assertTrue(tank.isMoving());
     }
 }

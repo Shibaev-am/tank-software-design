@@ -1,9 +1,6 @@
 package ru.mipt.bit.platformer.model;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
-
-import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
 public class Tank extends GameObject {
     private static final float MOVEMENT_DURATION = 0.4f;
@@ -13,11 +10,10 @@ public class Tank extends GameObject {
     private Direction direction = Direction.RIGHT;
     private float movementProgress = 1f;
 
-    public Tank(TextureRegion graphics, GridPoint2 coordinates, Field field) {
-        super(graphics, coordinates);
+    public Tank(GridPoint2 coordinates, Field field) {
+        super(coordinates);
         this.field = field;
         this.destination = new GridPoint2(coordinates);
-        field.placeAtTileCenter(rectangle, coordinates);
     }
 
     public void move(Direction direction) {
@@ -34,8 +30,7 @@ public class Tank extends GameObject {
     }
 
     public void update(float deltaTime) {
-        movementProgress = continueProgress(movementProgress, deltaTime, MOVEMENT_DURATION);
-        field.moveBetweenTiles(rectangle, coordinates, destination, movementProgress);
+        movementProgress = Math.min(1f, Math.max(0f, movementProgress + deltaTime / MOVEMENT_DURATION));
         if (!isMoving()) {
             coordinates.set(destination);
         }
@@ -49,8 +44,11 @@ public class Tank extends GameObject {
         return direction;
     }
 
-    @Override
-    protected float getRotation() {
-        return direction.getRotation();
+    public GridPoint2 getDestinationCoordinates() {
+        return new GridPoint2(destination);
+    }
+
+    public float getMovementProgress() {
+        return movementProgress;
     }
 }
