@@ -19,6 +19,23 @@ public final class RenderUtils {
     private RenderUtils() {
     }
 
+    public static TiledMapTileLayer resizeGroundLayer(TiledMap map, int width, int height) {
+        TiledMapTileLayer original = getSingleLayer(map);
+        TiledMapTileLayer ground = new TiledMapTileLayer(width, height,
+                original.getTileWidth(), original.getTileHeight());
+        ground.setName(original.getName());
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                ground.setCell(x, y, original.getCell(x % original.getWidth(), y % original.getHeight()));
+            }
+        }
+        map.getLayers().remove(original);
+        map.getLayers().add(ground);
+        map.getProperties().put("width", width);
+        map.getProperties().put("height", height);
+        return ground;
+    }
+
     public static OrthogonalTiledMapRenderer createSingleLayerMapRenderer(TiledMap tiledMap, Batch batch) {
         TiledMapTileLayer tileLayer = getSingleLayer(tiledMap);
         float viewWidth = tileLayer.getWidth() * tileLayer.getTileWidth();
