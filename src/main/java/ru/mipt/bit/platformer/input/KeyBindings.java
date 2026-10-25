@@ -1,6 +1,8 @@
 package ru.mipt.bit.platformer.input;
 
+import ru.mipt.bit.platformer.command.Command;
+
 public interface KeyBindings {
-    void bindHeld(Runnable action, int... keys);
-    void bindPressed(Runnable action, int... keys);
+    void bindHeld(Command action, int... keys);
+    void bindPressed(Command action, int... keys);
 }

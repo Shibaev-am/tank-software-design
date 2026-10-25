@@ -1,11 +1,14 @@
 package ru.mipt.bit.platformer.input;
 
+import ru.mipt.bit.platformer.command.Command;
+import ru.mipt.bit.platformer.control.ControlStrategy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.IntPredicate;
 
-public class KeyboardHandler implements InputHandler, KeyBindings {
+public class KeyboardHandler implements ControlStrategy, KeyBindings {
     private final IntPredicate isKeyPressed;
     private final List<KeyBinding> bindings = new ArrayList<>();
 
@@ -14,12 +17,12 @@ public class KeyboardHandler implements InputHandler, KeyBindings {
     }
 
     @Override
-    public void bindHeld(Runnable action, int... keys) {
+    public void bindHeld(Command action, int... keys) {
         bindings.add(new KeyBinding(action, true, keys));
     }
 
     @Override
-    public void bindPressed(Runnable action, int... keys) {
+    public void bindPressed(Command action, int... keys) {
         bindings.add(new KeyBinding(action, false, keys));
     }
 
@@ -31,12 +34,12 @@ public class KeyboardHandler implements InputHandler, KeyBindings {
     }
 
     private static class KeyBinding {
-        private final Runnable action;
+        private final Command action;
         private final boolean repeat;
         private final int[] keys;
         private boolean wasPressed;
 
-        private KeyBinding(Runnable action, boolean repeat, int[] keys) {
+        private KeyBinding(Command action, boolean repeat, int[] keys) {
             this.action = Objects.requireNonNull(action);
             if (keys.length == 0) {
                 throw new IllegalArgumentException("At least one key is required");
@@ -54,7 +57,7 @@ public class KeyboardHandler implements InputHandler, KeyBindings {
                 }
             }
             if (pressed && (repeat || !wasPressed)) {
-                action.run();
+                action.execute();
             }
             wasPressed = pressed;
         }

@@ -3,6 +3,7 @@ package ru.mipt.bit.platformer.input;
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.Before;
 import org.junit.Test;
+import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Field;
 import ru.mipt.bit.platformer.model.Tank;
@@ -125,17 +126,17 @@ public class TankControlsTest {
 
     @Test
     public void bindingsCanBeRegisteredThroughAnotherImplementation() {
-        List<Runnable> actions = new ArrayList<>();
+        List<Command> actions = new ArrayList<>();
         List<Integer> keys = new ArrayList<>();
         KeyBindings binder = new KeyBindings() {
             @Override
-            public void bindHeld(Runnable action, int... aliases) {
+            public void bindHeld(Command action, int... aliases) {
                 actions.add(action);
                 keys.add(aliases[0]);
             }
 
             @Override
-            public void bindPressed(Runnable action, int... aliases) {
+            public void bindPressed(Command action, int... aliases) {
                 fail("Movement should use held bindings");
             }
         };
@@ -143,7 +144,7 @@ public class TankControlsTest {
         TankControls.bindMovement(binder, moves::add,
                 java.util.Collections.singletonMap(Direction.DOWN, new int[]{42}));
         assertEquals(java.util.Collections.singletonList(42), keys);
-        actions.get(0).run();
+        actions.get(0).execute();
         assertEquals(java.util.Collections.singletonList(Direction.DOWN), moves);
     }
 }

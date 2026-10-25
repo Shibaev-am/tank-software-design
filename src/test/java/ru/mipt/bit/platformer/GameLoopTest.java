@@ -31,7 +31,7 @@ public class GameLoopTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void requiresAnInputHandler() {
+    public void requiresAControlStrategy() {
         new GameLoop(null, delta -> { }, renderer(new ArrayList<>()));
     }
 

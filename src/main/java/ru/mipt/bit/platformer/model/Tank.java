@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import java.util.Objects;
 
-public class Tank extends GameObject implements MovementState, Updatable {
+public class Tank extends GameObject implements MovementState, Updatable, Obstacle {
     private final Passability passability;
     private final float movementDuration;
     private final GridPoint2 destination;
@@ -27,7 +27,7 @@ public class Tank extends GameObject implements MovementState, Updatable {
             return;
         }
 
-        this.direction = direction;
+        this.direction = Objects.requireNonNull(direction);
         GridPoint2 nextTile = direction.nextTile(coordinates);
         if (passability.isPassable(nextTile)) {
             destination.set(nextTile);
@@ -45,6 +45,11 @@ public class Tank extends GameObject implements MovementState, Updatable {
 
     public boolean isMoving() {
         return movementProgress < 1f;
+    }
+
+    @Override
+    public boolean occupies(GridPoint2 tile) {
+        return coordinates.equals(tile) || destination.equals(tile);
     }
 
     @Override
