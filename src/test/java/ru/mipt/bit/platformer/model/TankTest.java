@@ -13,13 +13,13 @@ public class TankTest {
     @Before
     public void setUp() {
         field = new Field();
-        tank = new Tank(new GridPoint2(1, 1), field, 0.4f, Direction.RIGHT);
+        tank = new TankField(field).createTank(new GridPoint2(1, 1), 0.4f, Direction.RIGHT);
     }
 
     @Test
     public void movesOneTileInEachDirection() {
         for (Direction direction : Direction.values()) {
-            Tank player = new Tank(new GridPoint2(3, 3), field, 0.4f, Direction.RIGHT);
+            Tank player = new TankField(field).createTank(new GridPoint2(3, 3), 0.4f, Direction.RIGHT);
             player.move(direction);
             player.update(0.4f);
             assertEquals(direction.nextTile(new GridPoint2(3, 3)), player.getCoordinates());
@@ -70,7 +70,7 @@ public class TankTest {
     @Test
     public void coordinatesCannotBeChangedFromOutside() {
         GridPoint2 start = new GridPoint2(1, 1);
-        Tank player = new Tank(start, field, 0.4f, Direction.RIGHT);
+        Tank player = new TankField(field).createTank(start, 0.4f, Direction.RIGHT);
         start.set(8, 8);
         player.getCoordinates().set(9, 9);
         assertEquals(new GridPoint2(1, 1), player.getCoordinates());
@@ -117,7 +117,7 @@ public class TankTest {
 
     @Test
     public void movementDurationAndInitialDirectionAreParameters() {
-        Tank player = new Tank(new GridPoint2(2, 2), field, 1f, Direction.DOWN);
+        Tank player = new TankField(field).createTank(new GridPoint2(2, 2), 1f, Direction.DOWN);
         assertEquals(Direction.DOWN, player.getDirection());
         player.move(Direction.LEFT);
         player.update(0.4f);
@@ -129,7 +129,7 @@ public class TankTest {
 
     @Test
     public void usesAnArbitraryPassabilityPolicy() {
-        Tank player = new Tank(new GridPoint2(1, 1), tile -> tile.x < 2, 0.4f, Direction.UP);
+        Tank player = new TankField(tile -> tile.x < 2).createTank(new GridPoint2(1, 1), 0.4f, Direction.UP);
         player.move(Direction.RIGHT);
         assertFalse(player.isMoving());
         assertEquals(Direction.RIGHT, player.getDirection());
@@ -142,7 +142,7 @@ public class TankTest {
     public void rejectsInvalidMovementDurations() {
         for (float duration : new float[]{0f, -1f, Float.NaN, Float.POSITIVE_INFINITY}) {
             try {
-                new Tank(new GridPoint2(1, 1), field, duration, Direction.RIGHT);
+                new TankField(field).createTank(new GridPoint2(1, 1), duration, Direction.RIGHT);
                 fail("Invalid duration accepted: " + duration);
             } catch (IllegalArgumentException expected) {
                 assertFalse(expected.getMessage().isEmpty());

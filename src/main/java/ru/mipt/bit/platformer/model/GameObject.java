@@ -2,7 +2,7 @@ package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-public abstract class GameObject implements Positioned {
+public abstract class GameObject implements Positioned, Updatable {
     protected final GridPoint2 coordinates;
 
     protected GameObject(GridPoint2 coordinates) {
@@ -12,5 +12,9 @@ public abstract class GameObject implements Positioned {
     @Override
     public GridPoint2 getCoordinates() {
         return new GridPoint2(coordinates);
+    }
+
+    @Override
+    public void update(float deltaTime) {
     }
 }

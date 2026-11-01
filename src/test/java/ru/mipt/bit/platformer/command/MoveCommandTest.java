@@ -1,13 +1,13 @@
 package ru.mipt.bit.platformer.command;
 
 import com.badlogic.gdx.math.GridPoint2;
-import org.junit.Test;
-import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.Tank;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Test;
+import ru.mipt.bit.platformer.model.Direction;
+import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.TankField;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +24,7 @@ public class MoveCommandTest {
 
     @Test
     public void delegatesCollisionAndMovementRulesToTheReceiver() {
-        Tank tank = new Tank(new GridPoint2(0, 0), tile -> tile.x < 1, 0.4f, Direction.UP);
+        Tank tank = new TankField(tile -> tile.x < 1).createTank(new GridPoint2(0, 0), 0.4f, Direction.UP);
         new MoveCommand(tank::move, Direction.RIGHT).execute();
         assertEquals(Direction.RIGHT, tank.getDirection());
         assertFalse(tank.isMoving());

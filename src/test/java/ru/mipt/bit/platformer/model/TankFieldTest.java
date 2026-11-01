@@ -1,10 +1,9 @@
 package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
+import java.util.Collections;
 import org.junit.Test;
 import ru.mipt.bit.platformer.level.Level;
-
-import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -99,7 +98,7 @@ public class TankFieldTest {
     @Test
     public void tankOccupancyTracksMovesInEveryDirection() {
         for (Direction direction : Direction.values()) {
-            Tank tank = new Tank(new GridPoint2(1, 1), tile -> true, 0.4f, Direction.UP);
+            Tank tank = new TankField(tile -> true).createTank(new GridPoint2(1, 1), 0.4f, Direction.UP);
             GridPoint2 start = tank.getCoordinates();
             GridPoint2 end = direction.nextTile(start);
             assertTrue(tank.occupies(start));

@@ -15,7 +15,11 @@ public abstract class SpriteView implements SpriteRenderer {
     private final TileMovement tileMovement;
 
     protected SpriteView(String texturePath, TileMovement tileMovement) {
-        texture = new Texture(texturePath);
+        this(new Texture(texturePath), tileMovement);
+    }
+
+    protected SpriteView(Texture texture, TileMovement tileMovement) {
+        this.texture = texture;
         graphics = new TextureRegion(texture);
         rectangle = createBoundingRectangle(graphics);
         this.tileMovement = tileMovement;
