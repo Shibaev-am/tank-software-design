@@ -1,10 +1,19 @@
 package ru.mipt.bit.platformer.level;
 
 import com.badlogic.gdx.math.GridPoint2;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import org.junit.Test;
 import ru.mipt.bit.platformer.GameLoop;
 import ru.mipt.bit.platformer.Renderer;
 import ru.mipt.bit.platformer.command.Command;
+import ru.mipt.bit.platformer.command.CommandQueue;
 import ru.mipt.bit.platformer.command.MoveCommand;
 import ru.mipt.bit.platformer.control.CompositeControlStrategy;
 import ru.mipt.bit.platformer.control.ControlStrategy;
@@ -16,15 +25,6 @@ import ru.mipt.bit.platformer.model.GameModel;
 import ru.mipt.bit.platformer.model.RandomTankSpawner;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.TankField;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -116,7 +116,7 @@ public class MultiTankGameplayTest {
     }
 
     private static GameLoop loop(TankField field, List<ControlStrategy> controls) {
-        return new GameLoop(new CompositeControlStrategy(controls), new GameModel(field.getTanks()), new Renderer() {
+        return new GameLoop(new CompositeControlStrategy(controls), new CommandQueue(), new GameModel(field.getTanks()), new Renderer() {
             @Override
             public void render() {
             }

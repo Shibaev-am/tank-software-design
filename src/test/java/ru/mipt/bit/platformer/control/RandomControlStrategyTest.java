@@ -1,17 +1,17 @@
 package ru.mipt.bit.platformer.control;
 
 import com.badlogic.gdx.math.GridPoint2;
-import org.junit.Test;
-import ru.mipt.bit.platformer.command.Command;
-import ru.mipt.bit.platformer.command.MoveCommand;
-import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.Tank;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import org.junit.Test;
+import ru.mipt.bit.platformer.command.Command;
+import ru.mipt.bit.platformer.command.MoveCommand;
+import ru.mipt.bit.platformer.model.Direction;
+import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.TankField;
 
 import static org.junit.Assert.*;
 
@@ -31,7 +31,7 @@ public class RandomControlStrategyTest {
 
     @Test
     public void leavesAnActiveMoveAloneAndContinuesAfterArrival() {
-        Tank tank = new Tank(new GridPoint2(1, 1), tile -> true, 0.4f, Direction.UP);
+        Tank tank = new TankField(tile -> true).createTank(new GridPoint2(1, 1), 0.4f, Direction.UP);
         RandomControlStrategy control = new RandomControlStrategy(tank::isMoving,
                 Collections.singletonList(new MoveCommand(tank::move, Direction.RIGHT)), new Random(1));
         control.update();
@@ -68,7 +68,7 @@ public class RandomControlStrategyTest {
 
     @Test
     public void retriesAfterABlockedMove() {
-        Tank tank = new Tank(new GridPoint2(0, 0), tile -> tile.x == 0, 0.4f, Direction.UP);
+        Tank tank = new TankField(tile -> tile.x == 0).createTank(new GridPoint2(0, 0), 0.4f, Direction.UP);
         Random sequence = new Random(0) {
             private int next;
             @Override

@@ -1,21 +1,22 @@
 package ru.mipt.bit.platformer.level;
 
 import com.badlogic.gdx.math.GridPoint2;
-import org.junit.Test;
-import ru.mipt.bit.platformer.GameLoop;
-import ru.mipt.bit.platformer.Renderer;
-import ru.mipt.bit.platformer.input.KeyboardHandler;
-import ru.mipt.bit.platformer.input.TankControls;
-import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.GameModel;
-import ru.mipt.bit.platformer.model.Tank;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.Test;
+import ru.mipt.bit.platformer.GameLoop;
+import ru.mipt.bit.platformer.Renderer;
+import ru.mipt.bit.platformer.command.CommandQueue;
+import ru.mipt.bit.platformer.input.KeyboardHandler;
+import ru.mipt.bit.platformer.input.TankControls;
+import ru.mipt.bit.platformer.model.Direction;
+import ru.mipt.bit.platformer.model.GameModel;
+import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.TankField;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +25,7 @@ public class LevelGameplayTest {
     public void usesLoadedTreesAndBordersDuringTheGameLoop() throws IOException {
         Level level = new FileLevelLoader(() -> new ByteArrayInputStream(
                 "_T_\n_X_\n___".getBytes(StandardCharsets.UTF_8))).load();
-        Tank tank = new Tank(level.getPlayerStart(), level, 0.4f, Direction.RIGHT);
+        Tank tank = new TankField(level).createTank(level.getPlayerStart(), 0.4f, Direction.RIGHT);
         Set<Integer> pressed = new HashSet<>();
         KeyboardHandler keyboard = new KeyboardHandler(pressed::contains);
         TankControls.bindMovement(keyboard, tank::move,
@@ -42,7 +43,7 @@ public class LevelGameplayTest {
             public void dispose() {
             }
         };
-        GameLoop loop = new GameLoop(keyboard, new GameModel(Collections.singletonList(tank)), renderer);
+        GameLoop loop = new GameLoop(keyboard, new CommandQueue(), new GameModel(Collections.singletonList(tank)), renderer);
         pressed.add(1);
         loop.render(0.4f);
         assertEquals(new GridPoint2(1, 1), tank.getCoordinates());

@@ -1,21 +1,21 @@
 package ru.mipt.bit.platformer.input;
 
 import com.badlogic.gdx.math.GridPoint2;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Field;
 import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.TankField;
 import ru.mipt.bit.platformer.model.Tree;
-
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import static com.badlogic.gdx.Input.Keys.*;
 import static org.junit.Assert.*;
@@ -29,7 +29,7 @@ public class TankControlsTest {
     @Before
     public void setUp() {
         field = new Field();
-        tank = new Tank(new GridPoint2(1, 1), field, 0.4f, Direction.RIGHT);
+        tank = new TankField(field).createTank(new GridPoint2(1, 1), 0.4f, Direction.RIGHT);
         TankControls.bindMovement(keyboard, tank::move, defaultKeys());
     }
 
@@ -41,7 +41,7 @@ public class TankControlsTest {
             for (int key : keys[i]) {
                 pressedKeys.clear();
                 pressedKeys.add(key);
-                Tank player = new Tank(new GridPoint2(3, 3), field, 0.4f, Direction.RIGHT);
+                Tank player = new TankField(field).createTank(new GridPoint2(3, 3), 0.4f, Direction.RIGHT);
                 KeyboardHandler input = new KeyboardHandler(pressedKeys::contains);
                 TankControls.bindMovement(input, player::move, defaultKeys());
                 input.update();
