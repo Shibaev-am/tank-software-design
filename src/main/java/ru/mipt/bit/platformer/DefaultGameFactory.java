@@ -17,24 +17,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.command.CommandQueue;
 import ru.mipt.bit.platformer.command.MoveCommand;
 import ru.mipt.bit.platformer.command.ShootCommand;
+import ru.mipt.bit.platformer.command.ToggleCommand;
 import ru.mipt.bit.platformer.control.CompositeControlStrategy;
 import ru.mipt.bit.platformer.control.ControlStrategy;
 import ru.mipt.bit.platformer.control.RandomControlStrategy;
 import ru.mipt.bit.platformer.graphics.BulletView;
 import ru.mipt.bit.platformer.graphics.FieldView;
 import ru.mipt.bit.platformer.graphics.GameRenderer;
+import ru.mipt.bit.platformer.graphics.HealthBarDecorator;
+import ru.mipt.bit.platformer.graphics.HealthBarLayout;
+import ru.mipt.bit.platformer.graphics.HealthBarView;
 import ru.mipt.bit.platformer.graphics.MovingObjectView;
 import ru.mipt.bit.platformer.graphics.ObjectViews;
+import ru.mipt.bit.platformer.graphics.SpriteRenderer;
 import ru.mipt.bit.platformer.graphics.StaticObjectView;
 import ru.mipt.bit.platformer.graphics.TileMovement;
 import ru.mipt.bit.platformer.graphics.ViewFactory;
 import ru.mipt.bit.platformer.input.KeyboardHandler;
 import ru.mipt.bit.platformer.input.TankControls;
+import ru.mipt.bit.platformer.input.ToggleState;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.level.LevelLoader;
 import ru.mipt.bit.platformer.model.Bullet;
@@ -69,6 +76,7 @@ public class DefaultGameFactory implements Supplier<GameLoop> {
         GameModel model = new GameModel(weapon.getBulletTileDuration() / 2f);
         TankField field = new TankField(layout, model, 100, weapon);
         CommandQueue commands = new CommandQueue();
+        ToggleState healthBars = new ToggleState(false);
 
         Batch batch = new SpriteBatch();
         TiledMap level = new TmxMapLoader().load("level.tmx");
@@ -82,17 +90,18 @@ public class DefaultGameFactory implements Supplier<GameLoop> {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         TileMovement movement = new TileMovement(ground, Interpolation.smooth);
+        TileMovement bulletMovement = new TileMovement(ground, Interpolation.linear);
         FieldView background = new FieldView(level, batch, camera);
         ViewFactory viewFactory = new ViewFactory();
-        viewFactory.register(Tank.class, tank -> new MovingObjectView(tank, "images/tank_blue.png", movement));
+        viewFactory.register(Tank.class, tank -> tankView(tank, movement, Color.WHITE, healthBars));
         viewFactory.register(Tree.class, tree -> new StaticObjectView(List.of(tree), "images/greenTree.png", movement, 0f));
-        viewFactory.register(Bullet.class, bullet -> new BulletView(bullet, new TileMovement(ground, Interpolation.linear)));
+        viewFactory.register(Bullet.class, bullet -> new HealthBarDecorator(new BulletView(bullet, bulletMovement),
+                new HealthBarView(bullet, new HealthBarLayout(bullet, bulletMovement, 16f, 3f, 10f)), healthBars));
         ObjectViews views = new ObjectViews(model, viewFactory);
 
         layout.getTrees().forEach(model::addObject);
         Tank player = field.createTank(layout.getPlayerStart(), 0.4f, Direction.RIGHT);
-        viewFactory.register(Tank.class, tank -> new MovingObjectView(tank, "images/tank_blue.png", movement,
-                new Color(1f, 0.55f, 0.55f, 1f)));
+        viewFactory.register(Tank.class, tank -> tankView(tank, movement, new Color(1f, 0.55f, 0.55f, 1f), healthBars));
         List<Tank> bots = new RandomTankSpawner(layout.getWidth(), layout.getHeight(), 5, 0.4f, random)
                 .spawn(field);
         KeyboardHandler keyboard = new KeyboardHandler(key -> Gdx.input.isKeyPressed(key));
@@ -103,6 +112,7 @@ public class DefaultGameFactory implements Supplier<GameLoop> {
         keys.put(Direction.RIGHT, new int[]{RIGHT, D});
         TankControls.bindMovement(keyboard, direction -> commands.submit(new MoveCommand(player::move, direction)), keys);
         keyboard.bindPressed(commands.defer(new ShootCommand(player::shoot)), SPACE);
+        keyboard.bindPressed(commands.defer(new ToggleCommand(healthBars::toggle)), L);
         List<ControlStrategy> controls = new ArrayList<>();
         controls.add(keyboard);
         for (Tank bot : bots) {
@@ -117,5 +127,10 @@ public class DefaultGameFactory implements Supplier<GameLoop> {
         }
         GameRenderer renderer = new GameRenderer(batch, background, List.of(views), new Color(0f, 0f, 0.2f, 1f));
         return new GameLoop(new CompositeControlStrategy(controls), commands, model, renderer);
+    }
+
+    private SpriteRenderer tankView(Tank tank, TileMovement movement, Color tint, BooleanSupplier healthBars) {
+        return new HealthBarDecorator(new MovingObjectView(tank, "images/tank_blue.png", movement, tint),
+                new HealthBarView(tank, new HealthBarLayout(tank, movement, 72f, 6f, 48f)), healthBars);
     }
 }
