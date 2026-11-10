@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import java.util.Objects;
 
-public final class Bullet extends GameObject implements MovementState, ProjectileTarget {
+public final class Bullet extends GameObject implements MovementState, ProjectileTarget, HealthState {
     private final Direction direction;
     private final Tank owner;
     private final int damage;
@@ -60,6 +60,16 @@ public final class Bullet extends GameObject implements MovementState, Projectil
 
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public int getHealth() {
+        return active ? 1 : 0;
+    }
+
+    @Override
+    public int getMaxHealth() {
+        return 1;
     }
 
     @Override

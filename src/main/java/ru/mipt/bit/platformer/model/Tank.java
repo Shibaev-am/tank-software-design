@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import java.util.Objects;
 
-public class Tank extends GameObject implements MovementState, ProjectileTarget {
+public class Tank extends GameObject implements MovementState, ProjectileTarget, HealthState {
     private final Passability passability;
     private final float movementDuration;
     private final GridPoint2 destination;
@@ -13,6 +13,7 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget 
     private final CombatWorld world;
     private final WeaponSettings weapon;
     private int health;
+    private final int maxHealth;
     private float reloadRemaining;
 
     public Tank(GridPoint2 coordinates, Passability passability, float movementDuration, Direction direction,
@@ -29,6 +30,7 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget 
             throw new IllegalArgumentException("Health must be positive");
         }
         this.health = health;
+        this.maxHealth = health;
         this.weapon = Objects.requireNonNull(weapon);
         this.world = Objects.requireNonNull(world);
     }
@@ -85,8 +87,14 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget 
         }
     }
 
+    @Override
     public int getHealth() {
         return health;
+    }
+
+    @Override
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     @Override
