@@ -11,6 +11,7 @@ import java.util.List;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
+/** Выходной адаптер Renderer: кадр средствами libGDX. */
 public class GameRenderer implements Renderer {
     private final Batch batch;
     private final Renderer background;

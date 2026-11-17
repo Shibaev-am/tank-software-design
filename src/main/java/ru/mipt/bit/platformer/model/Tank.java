@@ -1,6 +1,8 @@
 package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.model.state.HealthBasedTankState;
+import ru.mipt.bit.platformer.model.state.TankState;
 
 import java.util.Objects;
 
@@ -15,6 +17,7 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget,
     private int health;
     private final int maxHealth;
     private float reloadRemaining;
+    private TankState state;
 
     public Tank(GridPoint2 coordinates, Passability passability, float movementDuration, Direction direction,
                 int health, WeaponSettings weapon, CombatWorld world) {
@@ -33,6 +36,7 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget,
         this.maxHealth = health;
         this.weapon = Objects.requireNonNull(weapon);
         this.world = Objects.requireNonNull(world);
+        this.state = HealthBasedTankState.forHealth(this);
     }
 
     public void move(Direction direction) {
@@ -60,15 +64,16 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget,
         if (!isAlive()) {
             return;
         }
-        reloadRemaining = Math.max(0f, reloadRemaining - deltaTime);
-        movementProgress = Math.min(1f, Math.max(0f, movementProgress + deltaTime / movementDuration));
+        reloadRemaining = Math.max(0f, reloadRemaining - state.reloadDelta(deltaTime));
+        movementProgress = Math.min(1f, Math.max(0f,
+                movementProgress + state.movementDelta(deltaTime, movementDuration)));
         if (!isMoving()) {
             coordinates.set(destination);
         }
     }
 
     public void shoot() {
-        if (isAlive() && reloadRemaining <= 0f) {
+        if (isAlive() && state.canShoot() && reloadRemaining <= 0f) {
             reloadRemaining = weapon.getReloadDuration();
             world.addBullet(new Bullet(direction.nextTile(coordinates), direction, this,
                     weapon.getDamage(), weapon.getBulletTileDuration(), world));
@@ -79,12 +84,18 @@ public class Tank extends GameObject implements MovementState, ProjectileTarget,
         if (damage < 0) {
             throw new IllegalArgumentException("Damage cannot be negative");
         }
-        if (isAlive()) {
+        if (isAlive() && damage > 0) {
             health = Math.max(0, health - damage);
             if (!isAlive()) {
                 world.remove(this);
+            } else {
+                changeState(state.onHealthChanged(this));
             }
         }
+    }
+
+    public void changeState(TankState state) {
+        this.state = Objects.requireNonNull(state);
     }
 
     @Override

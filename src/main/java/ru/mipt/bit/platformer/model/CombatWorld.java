@@ -1,5 +1,6 @@
 package ru.mipt.bit.platformer.model;
 
+/** Внутренний контракт domain: взаимодействие сущностей с полем боя. */
 public interface CombatWorld {
     void addBullet(Bullet bullet);
     void remove(GameObject object);

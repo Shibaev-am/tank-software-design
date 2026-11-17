@@ -8,6 +8,7 @@ import ru.mipt.bit.platformer.Renderer;
 
 import static ru.mipt.bit.platformer.graphics.RenderUtils.createSingleLayerMapRenderer;
 
+/** Выходной адаптер Renderer: фон из тайловой карты libGDX. */
 public class FieldView implements Renderer {
     private final TiledMap level;
     private final OrthogonalTiledMapRenderer levelRenderer;

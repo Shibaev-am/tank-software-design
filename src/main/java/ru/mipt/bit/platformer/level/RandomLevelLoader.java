@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+/** Адаптер LevelLoader: случайный уровень в памяти. */
 public class RandomLevelLoader implements LevelLoader {
     private final int width;
     private final int height;

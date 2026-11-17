@@ -56,6 +56,7 @@ import ru.mipt.bit.platformer.model.WeaponSettings;
 import static com.badlogic.gdx.Input.Keys.*;
 import static ru.mipt.bit.platformer.graphics.RenderUtils.resizeGroundLayer;
 
+/** Composition root: связывает модель, порты и адаптеры libGDX. */
 public class DefaultGameFactory implements Supplier<GameLoop> {
     private final LevelLoader levelLoader;
 

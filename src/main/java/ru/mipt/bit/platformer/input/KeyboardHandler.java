@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.IntPredicate;
 
+/** Входной адаптер: нажатия клавиш преобразуются в команды. */
 public class KeyboardHandler implements ControlStrategy, KeyBindings {
     private final IntPredicate isKeyPressed;
     private final List<KeyBinding> bindings = new ArrayList<>();

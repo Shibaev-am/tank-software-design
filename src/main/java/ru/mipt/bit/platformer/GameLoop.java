@@ -6,6 +6,7 @@ import ru.mipt.bit.platformer.model.Updatable;
 
 import java.util.Objects;
 
+/** Входной API application: выполнить кадр игры. */
 public class GameLoop {
     private final ControlStrategy control;
     private final Command commands;

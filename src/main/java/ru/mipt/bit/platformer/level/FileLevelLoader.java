@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/** Выходной адаптер LevelLoader: текстовый поток в модель уровня. */
 public class FileLevelLoader implements LevelLoader {
     private final InputStreamSource source;
 
