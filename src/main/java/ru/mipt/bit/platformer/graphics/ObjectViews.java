@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+/** Выходной адаптер ModelListener: события модели управляют отображениями. */
 public final class ObjectViews implements ModelListener, SpriteRenderer {
     private final GameModel model;
     private final Function<Updatable, SpriteRenderer> factory;

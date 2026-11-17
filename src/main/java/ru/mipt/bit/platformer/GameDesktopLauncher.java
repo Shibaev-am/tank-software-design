@@ -4,6 +4,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import ru.mipt.bit.platformer.level.LevelOptions;
 
+/** Infrastructure: параметры запуска и окно LWJGL. */
 public final class GameDesktopLauncher {
     private GameDesktopLauncher() {
     }

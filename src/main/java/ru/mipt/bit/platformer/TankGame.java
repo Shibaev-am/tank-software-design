@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+/** Входной адаптер: жизненный цикл libGDX вызывает GameLoop. */
 public class TankGame extends ApplicationAdapter {
     private final Supplier<GameLoop> createLoop;
     private GameLoop loop;

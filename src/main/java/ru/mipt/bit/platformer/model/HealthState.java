@@ -1,5 +1,6 @@
 package ru.mipt.bit.platformer.model;
 
+/** Контракт чтения здоровья domain для отображения. */
 public interface HealthState {
     int getHealth();
     int getMaxHealth();
